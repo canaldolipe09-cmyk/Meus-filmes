@@ -3,7 +3,6 @@ const axios = require('axios');
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Sua chave da API TMDB
 const API_KEY = 'bcd24cc5502cb4ceb135115cf749eb50'; 
 
 app.get('/', async (req, res) => {
@@ -13,30 +12,39 @@ app.get('/', async (req, res) => {
 
         let html = `
 <!DOCTYPE html>
-<html lang="pt-br">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MaxFlix Oficial</title>
+    <title>MaxFlix 2026</title>
     <style>
-        body { background: #000; color: #fff; font-family: sans-serif; margin: 0; text-align: center; }
-        header { 
-            background: linear-gradient(to bottom, #e50914, #b20710); 
-            padding: 20px; 
-            font-weight: bold; 
-            font-size: 24px; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        body { background: #000; color: #fff; font-family: sans-serif; text-align: center; margin: 0; }
+        header { background: #e50914; padding: 20px; font-weight: bold; font-size: 22px; }
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; }
+        img { width: 100%; border-radius: 8px; cursor: pointer; border: 1px solid #222; }
+        .aviso { background: #222; color: #ffca28; padding: 10px; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <header>MAXFLIX</header>
+    <div class="aviso">🛡️ Para ver SEM ANÚNCIOS, use o navegador BRAVE no celular.</div>
+    
+    <div class="grid">
+        ${filmes.map(f => `<img src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="assistir('${f.id}')">`).join('')}
+    </div>
+
+    <script>
+        function assistir(id) {
+            // Este link é o que mais "aguenta" cliques sem quebrar
+            window.location.href = "https://vidsrc.xyz/embed/movie/" + id;
         }
-        .grid { 
-            display: grid; 
-            grid-template-columns: repeat(3, 1fr); 
-            gap: 12px; 
-            padding: 15px; 
-        }
-        .movie-card { cursor: pointer; border: 1px solid #222; border-radius: 8px; overflow: hidden; }
-        .movie-card img { width: 100%; display: block; transition: 0.3s; }
-        .movie-card img:active { opacity: 0.6; transform: scale(0.95); }
-        .dica { 
-            background: #1a1a1a; 
-            color: #ffca28; 
-            padding: 10px;
+    </script>
+</body>
+</html>`;
+        res.send(html);
+    } catch (e) {
+        res.send("Erro ao carregar catálogo.");
+    }
+});
+
+app.listen(port, () => console.log("Online!"));
