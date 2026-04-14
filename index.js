@@ -44,19 +44,19 @@ app.get('/', async (req, res) => {
         h2 { margin: 25px 15px 10px; text-align: left; font-size: 18px; color: #e50914; }
         .row { display: flex; overflow-x: auto; gap: 10px; padding: 0 15px; scrollbar-width: none; }
         .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; }
-        .card { min-width: 125px; cursor: pointer; transition: 0.3s; }
+        .card { min-width: 125px; cursor: pointer; }
         .card img { width: 100%; border-radius: 10px; border: 1px solid #333; }
         #player-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; }
-        .nav-player { height: 60px; background: #111; display: flex; align-items: center; padding: 0 15px; justify-content: space-between; border-bottom: 2px solid #e50914; }
+        .nav-player { height: 60px; background: #111; display: flex; align-items: center; padding: 0 15px; border-bottom: 2px solid #e50914; }
         .btn-fechar { background: #e50914; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; }
         iframe { width: 100%; height: calc(100% - 60px); border: none; }
     </style>
 </head>
 <body>
     <header>
-        <div style="font-size: 24px; font-weight: bold; color: #fff;" onclick="window.location.href='/'">MAXFLIX</div>
+        <div style="font-size: 24px; font-weight: bold;" onclick="window.location.href='/'">MAXFLIX</div>
         <form class="search-box" action="/" method="GET">
-            <input type="text" name="search" placeholder="Buscar filmes, séries..." value="${query || ''}">
+            <input type="text" name="search" placeholder="Buscar..." value="${query || ''}">
             <button type="submit" class="btn-busca">🔍</button>
         </form>
     </header>
@@ -64,23 +64,18 @@ app.get('/', async (req, res) => {
     ${conteudoHtml}
 
     <div id="player-modal">
-        <div class="nav-player">
-            <button class="btn-fechar" onclick="fecharPlayer()">✕ FECHAR</button>
-            <span style="font-size: 11px; color: #ffca28;">Modo Anti-Anúncio Ativado</span>
-        </div>
-        <iframe id="video-iframe" allowfullscreen sandbox="allow-forms allow-scripts allow-same-origin"></iframe>
+        <div class="nav-player"><button class="btn-fechar" onclick="fecharPlayer()">✕ VOLTAR</button></div>
+        <iframe id="video-iframe" allowfullscreen></iframe>
     </div>
 
     <script>
-        // BLOQUEADOR DE JANELAS (CAPTURA TENTATIVAS DE POPUP)
-        window.open = function() { return { focus: function() {} }; };
-
         function abrirPlayer(tipo, id) {
             const modal = document.getElementById('player-modal');
             const frame = document.getElementById('video-iframe');
             
-            // Usando player que detecta dublagem automaticamente
-            frame.src = "https://embed.su/embed/" + (tipo === 'movie' ? 'movie' : 'tv') + "/" + id;
+            // Trocando para o servidor WarezCDN (mais estável para brasileiros)
+            let path = (tipo === 'movie') ? 'movie/' : 'serie/';
+            frame.src = "https://embed.warezcdn.net/" + path + id;
             
             modal.style.display = 'block';
             document.body.style.overflow = 'hidden';
@@ -97,8 +92,8 @@ app.get('/', async (req, res) => {
 </body>
 </html>`);
     } catch (e) {
-        res.send("Erro no servidor. Tente recarregar.");
+        res.send("Erro ao carregar catálogo.");
     }
 });
 
-app.listen(port, () => console.log("MaxFlix Protegido Online!"));
+app.listen(port, () => console.log("MaxFlix Online!"));
