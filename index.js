@@ -3,7 +3,6 @@ const axios = require('axios');
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Sua chave da API TMDB
 const API_KEY = 'bcd24cc5502cb4ceb135115cf749eb50'; 
 
 app.get('/', async (req, res) => {
@@ -89,12 +88,13 @@ app.get('/', async (req, res) => {
                     Episódio: <input type="number" id="ep" value="1" min="1">
                 </div>
 
-                <p style="color: var(--red); font-size: 12px;">DICA: Se abrir propaganda, feche-a e clique novamente no Play.</p>
-                <button class="btn-opt" onclick="gerarPlayer('vidsrc')">▶ Servidor 1 (Dublado/Legendado)</button>
-                <button class="btn-opt" onclick="gerarPlayer('embedsu')">▶ Servidor 2 (Alternativo)</button>
+                <p style="color: var(--red); font-size: 12px;">DICA: Se abrir propaganda, feche-a. Dublagem disponível nas opções do player.</p>
+                <button class="btn-opt" onclick="gerarPlayer('vidsrc')">▶ Servidor 1 (Mais Dublados)</button>
+                <button class="btn-opt" onclick="gerarPlayer('embedsu')">▶ Servidor 2 (Rápido)</button>
+                <button class="btn-opt" onclick="gerarPlayer('multi')">▶ Servidor 3 (Global - Se os outros falharem)</button>
             </div>
             <div class="player-container" id="p-container">
-                <iframe id="f-player" allowfullscreen sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts"></iframe>
+                <iframe id="f-player" allowfullscreen></iframe>
             </div>
         </div>
     </div>
@@ -122,14 +122,23 @@ app.get('/', async (req, res) => {
             const e = document.getElementById('ep').value;
             let url = '';
 
-            if (servidor === 'vidsrc') {
-                url = currentTipo === 'movie' 
-                    ? \`https://vidsrc.xyz/embed/movie?tmdb=\${currentId}\` 
-                    : \`https://vidsrc.xyz/embed/tv?tmdb=\${currentId}&season=\${s}&episode=\${e}\`;
+            // Ajuste do Sandbox baseado no servidor
+            if (servidor === 'multi') {
+                // Multiembed é chato com sandbox, então liberamos mais um pouco
+                iframe.setAttribute('sandbox', 'allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation-by-user-activation');
+                url = \`https://multiembed.mov/?video_id=\${currentId}&tmdb=1\${currentTipo === 'tv' ? '&s=' + s + '&e=' + e : ''}\`;
             } else {
-                url = currentTipo === 'movie'
-                    ? \`https://embed.su/embed/movie/\${currentId}\`
-                    : \`https://embed.su/embed/tv/\${currentId}/\${s}/\${e}\`;
+                // Servidores 1 e 2 funcionam bem com sandbox restrito
+                iframe.setAttribute('sandbox', 'allow-forms allow-pointer-lock allow-same-origin allow-scripts');
+                if (servidor === 'vidsrc') {
+                    url = currentTipo === 'movie' 
+                        ? \`https://vidsrc.xyz/embed/movie?tmdb=\${currentId}\` 
+                        : \`https://vidsrc.xyz/embed/tv?tmdb=\${currentId}&season=\${s}&episode=\${e}\`;
+                } else {
+                    url = currentTipo === 'movie'
+                        ? \`https://embed.su/embed/movie/\${currentId}\`
+                        : \`https://embed.su/embed/tv/\${currentId}/\${s}/\${e}\`;
+                }
             }
 
             document.getElementById('detalhes').style.display = 'none';
@@ -151,4 +160,4 @@ app.get('/', async (req, res) => {
     }
 });
 
-app.listen(port, () => console.log('Servidor ONLINE em http://localhost:' + port));
+app.listen(port, () => console.log('Servidor ONLINE'));
