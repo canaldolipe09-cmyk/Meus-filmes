@@ -19,37 +19,21 @@ app.get('/', async (req, res) => {
     <title>MaxFlix Oficial</title>
     <style>
         body { background: #000; color: #fff; font-family: sans-serif; margin: 0; text-align: center; }
-        header { background: #e50914; padding: 15px; font-weight: bold; font-size: 22px; position: sticky; top: 0; z-index: 10; }
+        header { background: #e50914; padding: 15px; font-weight: bold; font-size: 22px; position: sticky; top: 0; z-index: 100; }
         .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 10px; }
         img { width: 100%; border-radius: 8px; cursor: pointer; border: 1px solid #222; }
         
-        /* O Player que abre por cima da lista */
         #player-modal { 
-            display: none; 
-            position: fixed; 
-            top: 0; left: 0; 
-            width: 100%; height: 100%; 
-            background: #000; 
-            z-index: 1000; 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: #000; z-index: 1000; 
         }
-        .nav-player { 
-            height: 50px; 
-            background: #111; 
-            display: flex; 
-            align-items: center; 
-            padding: 0 15px; 
-            border-bottom: 1px solid #e50914;
-        }
-        .btn-fechar { 
-            background: #e50914; color: #fff; border: none; padding: 8px 15px; 
-            border-radius: 4px; font-weight: bold; cursor: pointer; 
-        }
+        .nav-player { height: 50px; background: #111; display: flex; align-items: center; padding: 0 15px; border-bottom: 1px solid #e50914; }
+        .btn-fechar { background: #e50914; color: #fff; border: none; padding: 8px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; }
         iframe { width: 100%; height: calc(100% - 50px); border: none; }
     </style>
 </head>
 <body>
     <header>MAXFLIX</header>
-    
     <div class="grid">
         ${filmes.map(f => `<img src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="abrirFilme('${f.id}')">`).join('')}
     </div>
@@ -57,7 +41,6 @@ app.get('/', async (req, res) => {
     <div id="player-modal">
         <div class="nav-player">
             <button class="btn-fechar" onclick="fecharFilme()">✕ VOLTAR</button>
-            <span style="margin-left: 20px; font-size: 14px;">Aguarde o Play...</span>
         </div>
         <iframe id="video-iframe" allowfullscreen></iframe>
     </div>
@@ -66,9 +49,8 @@ app.get('/', async (req, res) => {
         function abrirFilme(id) {
             const modal = document.getElementById('player-modal');
             const frame = document.getElementById('video-iframe');
-            
-            // Usando o vidsrc.xyz que é muito estável dentro de sites
-            frame.src = "https://vidsrc.xyz/embed/movie/" + id;
+            // Servidor mais estável para rodar dentro do site
+            frame.src = "https://vidsrc.me/embed/movie?tmdb=" + id;
             modal.style.display = 'block';
         }
 
@@ -83,7 +65,7 @@ app.get('/', async (req, res) => {
 </html>`;
         res.send(html);
     } catch (e) {
-        res.send("Erro ao carregar lista.");
+        res.send("Erro ao carregar lista. Tente atualizar a página.");
     }
 });
 
