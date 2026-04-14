@@ -3,7 +3,6 @@ const axios = require('axios');
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Chave da API TMDB
 const API_KEY = 'bcd24cc5502cb4ceb135115cf749eb50'; 
 
 app.get('/', async (req, res) => {
@@ -44,45 +43,31 @@ app.get('/', async (req, res) => {
     <title>MAXFLIX</title>
     <style>
         :root { --red: #e50914; --bg: #141414; }
-        body { background: var(--bg); color: #fff; font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; overflow-x: hidden; }
+        body { background: var(--bg); color: #fff; font-family: sans-serif; margin: 0; overflow-x: hidden; }
         header { padding: 15px 4%; position: fixed; width: 100%; top: 0; z-index: 1000; background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; }
         .logo { color: var(--red); font-size: 26px; font-weight: bold; text-decoration: none; }
         .search-form input { background: rgba(0,0,0,0.5); border: 1px solid #666; color: white; padding: 6px 12px; border-radius: 4px; outline: none; }
-        
         .hero { height: 60vh; background-size: cover; background-position: center; display: flex; align-items: center; padding: 0 4%; }
         .hero-content h1 { font-size: 2.5rem; text-shadow: 2px 2px 4px #000; margin: 0 0 20px 0; }
         .btn-play-hero { background: #fff; border: none; padding: 12px 30px; font-weight: bold; cursor: pointer; border-radius: 4px; font-size: 1rem; }
-
         .section-title { margin: 30px 4% 10px; font-size: 1.3rem; border-left: 4px solid var(--red); padding-left: 10px; }
         .row { display: flex; overflow-x: auto; gap: 12px; padding: 0 4% 20px; scrollbar-width: none; }
-        .row::-webkit-scrollbar { display: none; }
         .card { min-width: 160px; cursor: pointer; transition: 0.3s; }
-        .card:hover { transform: scale(1.08); z-index: 5; }
+        .card:hover { transform: scale(1.08); }
         .card img { width: 100%; border-radius: 4px; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; padding: 90px 4% 20px; }
-        
-        /* MODAL */
-        #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 9999; overflow-y: auto; }
+        #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; overflow-y: auto; }
         .modal-body { max-width: 900px; margin: 0 auto; padding: 20px; text-align: center; }
         .btn-close { background: var(--red); color: #fff; border: none; padding: 10px 30px; cursor: pointer; border-radius: 4px; font-weight: bold; margin-bottom: 20px; }
-        
-        /* PLAYER */
-        #video-container { width: 100%; aspect-ratio: 16/9; background: #000; margin-top: 10px; display: none; border: 2px solid #222; }
+        #video-container { width: 100%; aspect-ratio: 16/9; background: #000; display: none; margin-top: 10px; }
         iframe { width: 100%; height: 100%; border: none; }
-
-        .info-box { display: flex; text-align: left; gap: 20px; margin-top: 20px; flex-wrap: wrap; }
-        .info-text { flex: 1; min-width: 300px; }
-        .tag-dub { color: #46d369; font-weight: bold; margin-bottom: 10px; display: block; }
-        .btn-opt { background: #333; color: #fff; border: 1px solid var(--red); padding: 15px; cursor: pointer; border-radius: 4px; font-weight: bold; width: 100%; margin-top: 10px; transition: 0.2s; }
-        .btn-opt:hover { background: var(--red); }
+        .btn-opt { background: #222; color: #fff; border: 1px solid var(--red); padding: 15px; cursor: pointer; border-radius: 4px; font-weight: bold; width: 100%; margin-top: 10px; }
     </style>
 </head>
 <body>
     <header>
         <a href="/" class="logo">MAXFLIX</a>
-        <form action="/" method="GET" class="search-form">
-            <input type="text" name="search" placeholder="Buscar filmes/séries...">
-        </form>
+        <form action="/" method="GET" class="search-form"><input type="text" name="search" placeholder="Buscar..."></form>
     </header>
 
     ${conteudoHtml}
@@ -90,25 +75,15 @@ app.get('/', async (req, res) => {
     <div id="modal">
         <div class="modal-body">
             <button class="btn-close" onclick="fechar()">✕ VOLTAR</button>
-            
             <div id="video-container">
-                <iframe id="videoFrame" allowfullscreen referrerpolicy="no-referrer" sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation"></iframe>
+                <iframe id="videoFrame" allowfullscreen allow="autoplay; encrypted-media" referrerpolicy="no-referrer"></iframe>
             </div>
-
             <div id="detalhes-UI">
-                <div class="info-box">
-                    <img id="m-img" style="width:180px; border-radius: 8px; box-shadow: 0 0 15px rgba(0,0,0,0.5);">
-                    <div class="info-text">
-                        <h1 id="m-titulo" style="margin-top:0;"></h1>
-                        <span class="tag-dub">🔊 Áudio: Português (Dublado/Legendado)</span>
-                        <p id="m-sinopse" style="color:#bbb; font-size: 0.95rem; line-height: 1.6;"></p>
-                        
-                        <div id="player-buttons">
-                            <button class="btn-opt" onclick="play(1)">▶ ASSISTIR (Servidor Principal)</button>
-                            <button class="btn-opt" onclick="play(2)">▶ ASSISTIR (Servidor Reserva)</button>
-                        </div>
-                    </div>
-                </div>
+                <h1 id="m-titulo"></h1>
+                <p id="m-sinopse" style="color:#bbb; text-align: left;"></p>
+                <button class="btn-opt" onclick="play(1)">▶ SERVIDOR 1 (Dublado)</button>
+                <button class="btn-opt" onclick="play(2)">▶ SERVIDOR 2 (Principal)</button>
+                <button class="btn-opt" onclick="play(3)">▶ SERVIDOR 3 (Backup)</button>
             </div>
         </div>
     </div>
@@ -120,16 +95,11 @@ app.get('/', async (req, res) => {
         function verDetalhes(tipo, id, titulo, sinopse, img) {
             midId = id;
             midTipo = (tipo === 'movie' ? 'movie' : 'tv');
-
-            document.getElementById('m-img').src = img;
             document.getElementById('m-titulo').innerText = titulo;
-            document.getElementById('m-sinopse').innerText = sinopse || "Sinopse não disponível no momento.";
-            
-            // Reseta visual
+            document.getElementById('m-sinopse').innerText = sinopse || "Sem sinopse.";
             document.getElementById('video-container').style.display = 'none';
             document.getElementById('detalhes-UI').style.display = 'block';
             document.getElementById('videoFrame').src = '';
-
             document.getElementById('modal').style.display = 'block';
             document.body.style.overflow = 'hidden';
         }
@@ -138,14 +108,17 @@ app.get('/', async (req, res) => {
             const container = document.getElementById('video-container');
             const detalhes = document.getElementById('detalhes-UI');
             const iframe = document.getElementById('videoFrame');
-
             let url = '';
+
             if(srv === 1) {
-                // Servidor WarezCDN (Específico para conteúdo dublado/PT-BR)
+                // WarezCDN - Precisa ser 'filme' ou 'serie'
                 const cat = (midTipo === 'movie' ? 'filme' : 'serie');
                 url = "https://embed.warezcdn.com/" + cat + "/" + midId;
+            } else if(srv === 2) {
+                // VidSrc - Global (Geralmente em inglês, mas muito estável)
+                url = "https://vidsrc.me/embed/" + midTipo + "?tmdb=" + midId;
             } else {
-                // Servidor SuperEmbed (Global)
+                // MultiEmbed - Reserva
                 url = "https://multiembed.mov/?video_id=" + midId + "&tmdb=1";
             }
 
@@ -164,8 +137,8 @@ app.get('/', async (req, res) => {
 </html>
         `);
     } catch (error) {
-        res.status(500).send("Erro ao carregar dados da API. Verifique sua chave.");
+        res.status(500).send("Erro");
     }
 });
 
-app.listen(port, () => console.log('Site Online: http://localhost:' + port));
+app.listen(port, () => console.log('Porta ' + port));
