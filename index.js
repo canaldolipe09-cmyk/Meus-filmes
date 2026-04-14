@@ -27,30 +27,29 @@ app.get('/', async (req, res) => {
         body { background: #000; color: #fff; font-family: sans-serif; margin: 0; padding: 0; }
         header { 
             background: linear-gradient(to bottom, #e50914, #b20710); 
-            padding: 15px; 
+            padding: 20px; 
             font-weight: bold; 
-            font-size: 22px; 
+            font-size: 24px; 
             text-align: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            letter-spacing: 2px;
         }
         .grid { 
             display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); 
-            gap: 10px; 
-            padding: 15px; 
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); 
+            gap: 15px; 
+            padding: 20px; 
         }
-        .movie-card { position: relative; }
+        .movie-card { text-align: center; cursor: pointer; }
         .movie-card img { 
             width: 100%; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            transition: transform 0.2s;
-            border: 1px solid #333;
+            border-radius: 10px; 
+            transition: transform 0.3s;
+            border: 2px solid #222;
         }
-        .movie-card img:active { transform: scale(0.95); }
-        .movie-title { font-size: 10px; margin-top: 5px; color: #ccc; }
+        .movie-card img:hover { transform: scale(1.05); border-color: #e50914; }
+        .movie-title { font-size: 11px; margin-top: 8px; color: #fff; font-weight: bold; }
         
-        footer { padding: 20px; font-size: 12px; color: #666; text-align: center; }
+        footer { padding: 30px; font-size: 12px; color: #444; text-align: center; }
     </style>
 </head>
 <body>
@@ -65,18 +64,19 @@ app.get('/', async (req, res) => {
         `).join('')}
     </div>
 
-    <footer>Sistema rodando via Render Cloud</footer>
+    <footer>Conectado ao Servidor Render Pro</footer>
 
     <script>
         function assistir(id) {
-            // O segredo: Abrir o player em uma nova aba para evitar bloqueios do navegador
-            const playerUrl = "https://embed.smashystream.com/playere.php?tmdb=" + id;
+            // USANDO O VIDSRC - O MELHOR SERVER ATUAL
+            const playerUrl = "https://vidsrc.to/embed/movie/" + id;
             
-            // Tenta abrir a nova aba
-            const novaAba = window.open(playerUrl, '_blank');
-            
-            if (!novaAba) {
-                alert("Por favor, autorize pop-ups para assistir ao filme!");
+            // Abrir em nova aba para não ser bloqueado pelo navegador
+            const win = window.open(playerUrl, '_blank');
+            if (win) {
+                win.focus();
+            } else {
+                alert('Por favor, permita pop-ups para abrir o filme!');
             }
         }
     </script>
@@ -84,10 +84,10 @@ app.get('/', async (req, res) => {
 </html>`;
         res.send(html);
     } catch (e) {
-        res.status(500).send("Erro ao conectar com a nuvem. Verifique a API Key.");
+        res.status(500).send("Erro na Cloud: Verifique sua API Key.");
     }
 });
 
 app.listen(port, '0.0.0.0', () => {
-    console.log("Servidor Cloud Ativo!");
+    console.log("Servidor Cloud Online!");
 });
