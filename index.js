@@ -21,37 +21,53 @@ app.get('/', async (req, res) => {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MaxFlix Pro</title>
+    <title>MaxFlix Cloud</title>
     <style>
-        body { background: #000; color: #fff; font-family: sans-serif; margin: 0; padding: 0; }
-        header { background: #e50914; padding: 20px; text-align: center; font-weight: bold; font-size: 22px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; padding: 15px; }
-        .movie-card { text-align: center; cursor: pointer; }
-        .movie-card img { width: 100%; border-radius: 8px; border: 2px solid #222; }
-        .movie-title { font-size: 11px; margin-top: 5px; color: #ccc; }
-        .aviso { background: #333; padding: 10px; font-size: 12px; margin: 10px; border-radius: 5px; color: #ffca28; }
+        body { background: #000; color: #fff; font-family: sans-serif; margin: 0; text-align: center; }
+        header { background: #e50914; padding: 20px; font-weight: bold; font-size: 22px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; padding: 15px; }
+        .card { cursor: pointer; border: 1px solid #222; border-radius: 8px; overflow: hidden; background: #111; }
+        .card img { width: 100%; display: block; }
+        .title { font-size: 10px; padding: 5px; height: 30px; overflow: hidden; }
+        #menu-player { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); z-index:99; flex-direction: column; align-items: center; justify-content: center; }
+        .btn-play { background: #e50914; color: #fff; border: none; padding: 15px; margin: 10px; width: 80%; border-radius: 5px; font-weight: bold; }
+        .btn-voltar { background: #444; color: #fff; border: none; padding: 10px; margin-top: 20px; width: 50%; }
     </style>
 </head>
 <body>
     <header>MAXFLIX CLOUD</header>
+    <p style="font-size: 12px; color: #aaa;">Se o player não abrir, tente outra opção ou use uma VPN.</p>
     
-    <div class="aviso">ℹ️ Dica: O filme abrirá em uma nova aba para evitar bloqueios da operadora.</div>
-
     <div class="grid">
         ${filmes.map(f => `
-            <div class="movie-card" onclick="assistir('${f.id}')">
+            <div class="card" onclick="mostrarOpcoes('${f.id}')">
                 <img src="https://image.tmdb.org/t/p/w300${f.poster_path}">
-                <div class="movie-title">${f.title}</div>
+                <div class="title">${f.title}</div>
             </div>
         `).join('')}
     </div>
 
+    <div id="menu-player">
+        <h3>Escolha um Servidor:</h3>
+        <button class="btn-play" onclick="ir('https://vidsrc.to/embed/movie/', 1)">Opção 1 (Vidsrc)</button>
+        <button class="btn-play" onclick="ir('https://embed.smashystream.com/playere.php?tmdb=', 2)">Opção 2 (Smashy)</button>
+        <button class="btn-play" onclick="ir('https://multiembed.eu/?video_id=', 3)">Opção 3 (Multi)</button>
+        <button class="btn-play" onclick="ir('https://vidsrc.me/embed/movie?tmdb=', 1)">Opção 4 (Me)</button>
+        <button class="btn-voltar" onclick="fechar()">✕ CANCELAR</button>
+    </div>
+
     <script>
-        function assistir(id) {
-            // Tentaremos dois servidores diferentes caso um falhe
-            const url = "https://vidsrc.me/embed/movie?tmdb=" + id;
-            
-            // Isso força o navegador a abrir fora do site do Render
+        let idAtual = "";
+        function mostrarOpcoes(id) {
+            idAtual = id;
+            document.getElementById('menu-player').style.display = 'flex';
+        }
+        function fechar() {
+            document.getElementById('menu-player').style.display = 'none';
+        }
+        function ir(base, tipo) {
+            let url = base + idAtual;
+            if(tipo === 3) url = base + idAtual + "&tmdb=1";
             window.location.href = url;
         }
     </script>
@@ -59,8 +75,8 @@ app.get('/', async (req, res) => {
 </html>`;
         res.send(html);
     } catch (e) {
-        res.status(500).send("Erro ao carregar lista.");
+        res.send("Erro ao carregar lista.");
     }
 });
 
-app.listen(port, '0.0.0.0', () => console.log("Online"));
+app.listen(port, '0.0.0.0', () => console.log("Cloud Online"));
