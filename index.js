@@ -1,4 +1,4 @@
-const express = require('express');
+        const express = require('express');
 const axios = require('axios');
 const https = require('https');
 const app = express();
@@ -21,48 +21,46 @@ app.get('/', async (req, res) => {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MaxFlix Oficial</title>
+    <title>MaxFlix v1</title>
     <style>
-        body { background: #000; color: white; font-family: sans-serif; margin: 0; text-align: center; }
-        header { background: #e50914; padding: 15px; font-weight: bold; font-size: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.8); }
+        body { background: #111; color: white; font-family: sans-serif; margin: 0; text-align: center; }
         .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 10px; }
-        img { width: 100%; border-radius: 5px; cursor: pointer; border: 1px solid #222; }
-        #player-layer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 100; }
-        iframe { width: 100%; height: calc(100% - 60px); border: none; }
-        .footer-controls { height: 60px; background: #111; display: flex; align-items: center; justify-content: center; border-top: 1px solid #333; }
-        .btn-voltar { background: #e50914; color: white; border: none; padding: 12px 25px; border-radius: 4px; font-weight: bold; }
+        img { width: 100%; border-radius: 5px; cursor: pointer; border: 1px solid #333; }
+        #player-container { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 100; }
+        iframe { width: 100%; height: calc(100% - 50px); border: none; }
+        .back-btn { height: 50px; background: #e50914; color: white; line-height: 50px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
-    <header>MAXFLIX</header>
+    <h1 style="color: #e50914; margin: 15px 0;">MAXFLIX</h1>
     <div class="grid">
         ${filmes.map(f => `<img src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="play('${f.id}')">`).join('')}
     </div>
 
-    <div id="player-layer">
-        <div class="footer-controls">
-            <button class="btn-voltar" onclick="fechar()">✕ FECHAR VÍDEO</button>
-        </div>
-        <iframe id="ifr" src="" allowfullscreen></iframe>
+    <div id="player-container">
+        <div class="back-btn" onclick="fechar()">✕ VOLTAR PARA A LISTA</div>
+        <iframe id="video-iframe" src="" allowfullscreen></iframe>
     </div>
 
     <script>
         function play(id) {
-            const layer = document.getElementById('player-layer');
-            const ifr = document.getElementById('ifr');
-            // Voltando para o servidor MultiEmbed (que você confirmou que pegava)
+            const container = document.getElementById('player-container');
+            const ifr = document.getElementById('video-iframe');
+            // Usando o servidor que você confirmou que funcionava
             ifr.src = "https://multiembed.eu/?video_id=" + id + "&tmdb=1";
-            layer.style.display = 'block';
+            container.style.display = 'block';
         }
         function fechar() {
-            document.getElementById('player-layer').style.display = 'none';
-            document.getElementById('ifr').src = '';
+            document.getElementById('player-container').style.display = 'none';
+            document.getElementById('video-iframe').src = '';
         }
     </script>
 </body>
 </html>`;
         res.send(html);
-    } catch (e) { res.send("Erro ao carregar filmes."); }
+    } catch (e) {
+        res.send("Erro ao carregar lista de filmes.");
+    }
 });
 
-app.listen(port, '0.0.0.0', () => console.log("Sistema Pronto"));
+app.listen(port, '0.0.0.0', () => console.log("Servidor Online"));
