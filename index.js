@@ -4,7 +4,7 @@ const https = require('https');
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Substitua pela sua chave do TMDB se esta não funcionar
+// Chave da API do TMDB
 const API_KEY = 'bcd24cc5502cb4ceb135115cf749eb50'; 
 const agent = new https.Agent({ rejectUnauthorized: false });
 
@@ -22,81 +22,72 @@ app.get('/', async (req, res) => {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MaxFlix Pro</title>
+    <title>MaxFlix Pro - Cloud</title>
     <style>
         body { background: #000; color: #fff; font-family: sans-serif; margin: 0; padding: 0; }
-        header { background: #e50914; padding: 15px; font-weight: bold; font-size: 24px; position: sticky; top: 0; z-index: 10; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; padding: 15px; }
-        .movie-card img { width: 100%; border-radius: 5px; cursor: pointer; transition: 0.3s; border: 2px solid transparent; }
-        .movie-card img:hover { transform: scale(1.05); border-color: #fff; }
+        header { 
+            background: linear-gradient(to bottom, #e50914, #b20710); 
+            padding: 15px; 
+            font-weight: bold; 
+            font-size: 22px; 
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); 
+            gap: 10px; 
+            padding: 15px; 
+        }
+        .movie-card { position: relative; }
+        .movie-card img { 
+            width: 100%; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            transition: transform 0.2s;
+            border: 1px solid #333;
+        }
+        .movie-card img:active { transform: scale(0.95); }
+        .movie-title { font-size: 10px; margin-top: 5px; color: #ccc; }
         
-        #player-layer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 100; }
-        .controls { height: 80px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #111; border-bottom: 2px solid #e50914; }
-        .btns { display: flex; gap: 10px; margin-top: 10px; }
-        button { padding: 8px 15px; cursor: pointer; background: #333; color: #fff; border: 1px solid #555; border-radius: 4px; font-size: 14px; }
-        button.active { background: #e50914; border-color: #fff; }
-        button.close { background: #555; width: 90%; font-weight: bold; }
-        
-        iframe { width: 100%; height: calc(100% - 80px); border: none; }
+        footer { padding: 20px; font-size: 12px; color: #666; text-align: center; }
     </style>
 </head>
 <body>
-    <header>MAXFLIX</header>
+    <header>MAXFLIX CLOUD</header>
+    
     <div class="grid">
         ${filmes.map(f => `
-            <div class="movie-card">
-                <img src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="abrirPlayer('${f.id}')">
+            <div class="movie-card" onclick="assistir('${f.id}')">
+                <img src="https://image.tmdb.org/t/p/w300${f.poster_path}">
+                <div class="movie-title">${f.title}</div>
             </div>
         `).join('')}
     </div>
 
-    <div id="player-layer">
-        <div class="controls">
-            <button class="close" onclick="fechar()">✕ VOLTAR PARA A LISTA</button>
-            <div class="btns">
-                <button id="btn1" onclick="mudarServer(1)">Opção 1</button>
-                <button id="btn2" onclick="mudarServer(2)">Opção 2</button>
-                <button id="btn3" onclick="mudarServer(3)">Opção 3</button>
-            </div>
-        </div>
-        <iframe id="main-ifr" allowfullscreen></iframe>
-    </div>
+    <footer>Sistema rodando via Render Cloud</footer>
 
     <script>
-        let currentID = "";
-
-        function abrirPlayer(id) {
-            currentID = id;
-            document.getElementById('player-layer').style.display = 'block';
-            mudarServer(1);
-        }
-
-        function mudarServer(num) {
-            const ifr = document.getElementById('main-ifr');
+        function assistir(id) {
+            // O segredo: Abrir o player em uma nova aba para evitar bloqueios do navegador
+            const playerUrl = "https://embed.smashystream.com/playere.php?tmdb=" + id;
             
-            // Reset botões
-            document.querySelectorAll('.btns button').forEach(b => b.classList.remove('active'));
-            document.getElementById('btn' + num).classList.add('active');
-
-            // Novos servidores que funcionam melhor no Render
-            if(num === 1) ifr.src = "https://vidsrc.to/embed/movie/" + currentID;
-            if(num === 2) ifr.src = "https://multiembed.eu/?video_id=" + currentID + "&tmdb=1";
-            if(num === 3) ifr.src = "https://embed.smashystream.com/playere.php?tmdb=" + currentID;
-        }
-
-        function fechar() {
-            document.getElementById('player-layer').style.display = 'none';
-            document.getElementById('main-ifr').src = '';
+            // Tenta abrir a nova aba
+            const novaAba = window.open(playerUrl, '_blank');
+            
+            if (!novaAba) {
+                alert("Por favor, autorize pop-ups para assistir ao filme!");
+            }
         }
     </script>
 </body>
 </html>`;
         res.send(html);
     } catch (e) {
-        res.status(500).send("Erro ao carregar filmes. Verifique sua chave da API.");
+        res.status(500).send("Erro ao conectar com a nuvem. Verifique a API Key.");
     }
 });
 
 app.listen(port, '0.0.0.0', () => {
-    console.log(`Servidor rodando na porta ${port}`);
+    console.log("Servidor Cloud Ativo!");
 });
