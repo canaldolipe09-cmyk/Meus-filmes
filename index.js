@@ -16,7 +16,7 @@ app.get('/', async (req, res) => {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MaxFlix Oficial</title>
+    <title>MaxFlix 2026</title>
     <style>
         body { background: #000; color: #fff; font-family: sans-serif; margin: 0; text-align: center; }
         header { background: #e50914; padding: 15px; font-weight: bold; font-size: 22px; position: sticky; top: 0; z-index: 100; }
@@ -41,6 +41,7 @@ app.get('/', async (req, res) => {
     <div id="player-modal">
         <div class="nav-player">
             <button class="btn-fechar" onclick="fecharFilme()">✕ VOLTAR</button>
+            <span style="margin-left: 15px; font-size: 12px; color: #777;">Dica: Clique 2x no Play para liberar</span>
         </div>
         <iframe id="video-iframe" allowfullscreen></iframe>
     </div>
@@ -49,8 +50,8 @@ app.get('/', async (req, res) => {
         function abrirFilme(id) {
             const modal = document.getElementById('player-modal');
             const frame = document.getElementById('video-iframe');
-            // Servidor mais estável para rodar dentro do site
-            frame.src = "https://vidsrc.me/embed/movie?tmdb=" + id;
+            // Servidor focado em conteúdo dublado e rápido
+            frame.src = "https://embed.warezcdn.net/movie/" + id;
             modal.style.display = 'block';
         }
 
@@ -65,7 +66,7 @@ app.get('/', async (req, res) => {
 </html>`;
         res.send(html);
     } catch (e) {
-        res.send("Erro ao carregar lista. Tente atualizar a página.");
+        res.send("Erro ao carregar lista.");
     }
 });
 
