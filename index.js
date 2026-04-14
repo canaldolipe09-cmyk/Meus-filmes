@@ -3,6 +3,7 @@ const axios = require('axios');
 const app = express();
 const port = process.env.PORT || 3000;
 
+// Sua chave da API TMDB
 const API_KEY = 'bcd24cc5502cb4ceb135115cf749eb50'; 
 
 app.get('/', async (req, res) => {
@@ -12,44 +13,30 @@ app.get('/', async (req, res) => {
 
         let html = `
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MaxFlix Oficial</title>
     <style>
-        body { background: #000; color: #fff; font-family: sans-serif; text-align: center; margin: 0; }
-        header { background: #e50914; padding: 20px; font-weight: bold; font-size: 22px; }
-        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 10px; }
-        img { width: 100%; border-radius: 8px; cursor: pointer; border: 1px solid #222; }
-        .footer { padding: 20px; font-size: 12px; color: #555; }
-    </style>
-</head>
-<body>
-    <header>MAXFLIX</header>
-    <div style="background: #222; padding: 10px; font-size: 13px; color: #ffca28;">
-        ✅ DICA: Se a tela ficar branca, ligue o 4G/5G ou use uma VPN.
-    </div>
-    
-    <div class="grid">
-        ${filmes.map(f => `<img src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="assistir('${f.id}')">`).join('')}
-    </div>
-
-    <div class="footer">Servidor Render Online</div>
-
-    <script>
-        function assistir(id) {
-            // Este link usa o ID do TMDB diretamente no player mais compatível hoje
-            const playerUrl = "https://vidsrc.xyz/embed/movie/" + id;
-            window.location.href = playerUrl;
+        body { background: #000; color: #fff; font-family: sans-serif; margin: 0; text-align: center; }
+        header { 
+            background: linear-gradient(to bottom, #e50914, #b20710); 
+            padding: 20px; 
+            font-weight: bold; 
+            font-size: 24px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
-    </script>
-</body>
-</html>`;
-        res.send(html);
-    } catch (e) {
-        res.send("Erro: Verifique a conexão.");
-    }
-});
-
-app.listen(port, () => console.log("Site no ar!"));
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 12px; 
+            padding: 15px; 
+        }
+        .movie-card { cursor: pointer; border: 1px solid #222; border-radius: 8px; overflow: hidden; }
+        .movie-card img { width: 100%; display: block; transition: 0.3s; }
+        .movie-card img:active { opacity: 0.6; transform: scale(0.95); }
+        .dica { 
+            background: #1a1a1a; 
+            color: #ffca28; 
+            padding: 10px;
