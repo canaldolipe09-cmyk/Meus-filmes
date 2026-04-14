@@ -1,9 +1,10 @@
-        const express = require('express');
+const express = require('express');
 const axios = require('axios');
 const https = require('https');
 const app = express();
 const port = process.env.PORT || 3000;
 
+// Chave da API do TMDB (Se parar de carregar a lista, me avisa)
 const API_KEY = 'bcd24cc5502cb4ceb135115cf749eb50'; 
 const agent = new https.Agent({ rejectUnauthorized: false });
 
@@ -17,50 +18,51 @@ app.get('/', async (req, res) => {
 
         let html = `
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MaxFlix v1</title>
+    <title>MaxFlix 2026</title>
     <style>
-        body { background: #111; color: white; font-family: sans-serif; margin: 0; text-align: center; }
+        body { background: #000; color: #fff; font-family: sans-serif; margin: 0; padding: 0; text-align: center; }
+        header { background: #e50914; padding: 15px; font-size: 24px; font-weight: bold; position: sticky; top: 0; z-index: 100; }
         .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 10px; }
-        img { width: 100%; border-radius: 5px; cursor: pointer; border: 1px solid #333; }
-        #player-container { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 100; }
-        iframe { width: 100%; height: calc(100% - 50px); border: none; }
-        .back-btn { height: 50px; background: #e50914; color: white; line-height: 50px; cursor: pointer; font-weight: bold; }
+        .movie img { width: 100%; border-radius: 8px; cursor: pointer; border: 1px solid #333; }
+        #p-layer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 200; }
+        iframe { width: 100%; height: calc(100% - 60px); border: none; }
+        .btn-voltar { height: 60px; background: #222; color: #fff; line-height: 60px; font-weight: bold; cursor: pointer; border-bottom: 2px solid #e50914; }
     </style>
 </head>
 <body>
-    <h1 style="color: #e50914; margin: 15px 0;">MAXFLIX</h1>
+    <header>MAXFLIX</header>
     <div class="grid">
-        ${filmes.map(f => `<img src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="play('${f.id}')">`).join('')}
+        ${filmes.map(f => `<div class="movie"><img src="https://image.tmdb.org/t/p/w300${f.poster_path}" onclick="play('${f.id}')"></div>`).join('')}
     </div>
 
-    <div id="player-container">
-        <div class="back-btn" onclick="fechar()">✕ VOLTAR PARA A LISTA</div>
-        <iframe id="video-iframe" src="" allowfullscreen></iframe>
+    <div id="p-layer">
+        <div class="btn-voltar" onclick="fechar()">✕ VOLTAR PARA A LISTA</div>
+        <iframe id="video-ifr" src="" allowfullscreen></iframe>
     </div>
 
     <script>
         function play(id) {
-            const container = document.getElementById('player-container');
-            const ifr = document.getElementById('video-iframe');
-            // Usando o servidor que você confirmou que funcionava
-            ifr.src = "https://multiembed.eu/?video_id=" + id + "&tmdb=1";
-            container.style.display = 'block';
+            const layer = document.getElementById('p-layer');
+            const ifr = document.getElementById('video-ifr');
+            // Servidor vidsrc.to - O mais estável para evitar erros
+            ifr.src = "https://vidsrc.to/embed/movie/" + id;
+            layer.style.display = 'block';
         }
         function fechar() {
-            document.getElementById('player-container').style.display = 'none';
-            document.getElementById('video-iframe').src = '';
+            document.getElementById('p-layer').style.display = 'none';
+            document.getElementById('video-ifr').src = '';
         }
     </script>
 </body>
 </html>`;
         res.send(html);
     } catch (e) {
-        res.send("Erro ao carregar lista de filmes.");
+        res.status(500).send("Erro ao carregar a lista de filmes. Tente atualizar a página.");
     }
 });
 
-app.listen(port, '0.0.0.0', () => console.log("Servidor Online"));
+app.listen(port, '0.0.0.0', () => console.log("Servidor Online!"));
