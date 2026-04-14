@@ -3,56 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAXFLIX - Player de Vídeo</title>
+    <title>MAXFLIX - Solução de Erros</title>
     <style>
-        body { background-color: #000; color: #fff; font-family: Arial, sans-serif; text-align: center; }
-        .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; background: #000; }
-        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
-        .server-options { margin-top: 20px; display: flex; justify-content: center; gap: 10px; }
-        button { padding: 10px 20px; cursor: pointer; background: #e50914; color: white; border: none; border-radius: 5px; font-weight: bold; }
-        button:hover { background: #ff0a16; }
-        .error-msg { color: #ffc107; font-size: 0.9em; margin-top: 10px; }
+        body { background: #0b0b0b; color: #fff; font-family: sans-serif; margin: 0; padding: 20px; }
+        .player-wrapper { max-width: 900px; margin: auto; }
+        .frame-container { position: relative; padding-bottom: 56.25%; height: 0; background: #000; border: 2px solid #333; }
+        .frame-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        .controls { margin-top: 15px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+        button { background: #e50914; color: #fff; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #b20710; }
+        .status { margin-top: 10px; color: #aaa; font-size: 14px; }
     </style>
 </head>
 <body>
 
+<div class="player-wrapper">
     <h1>MAXFLIX</h1>
-
-    <div class="video-container">
+    
+    <div class="frame-container" id="container">
         <iframe 
-            id="main-player"
+            id="video-player"
             src="URL_DO_SERVIDOR_1" 
-            allowfullscreen 
-            allow="autoplay; encrypted-media"
-            sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation">
+            allowfullscreen="true" 
+            webkitallowfullscreen="true" 
+            mozallowfullscreen="true"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            referrerpolicy="no-referrer">
         </iframe>
     </div>
 
-    <div class="server-options">
-        <button onclick="changeServer('URL_DO_SERVIDOR_1')">Servidor 1</button>
-        <button onclick="changeServer('URL_DO_SERVIDOR_2')">Servidor 2</button>
-        <button onclick="changeServer('URL_DO_SERVIDOR_3')">Servidor 3 (Dublado)</button>
+    <div class="controls">
+        <button onclick="loadPlayer('URL_DO_SERVIDOR_1')">Servidor 1</button>
+        <button onclick="loadPlayer('URL_DO_SERVIDOR_2')">Servidor 2</button>
+        <button onclick="loadPlayer('URL_DO_SERVIDOR_3')">Servidor 3</button>
     </div>
+    
+    <p class="status" id="msg">Tentando carregar Servidor 1...</p>
+</div>
 
-    <p class="error-msg">Dica: Se o vídeo não carregar, tente alternar os servidores acima.</p>
-
-    <script>
-        function changeServer(url) {
-            const player = document.getElementById('main-player');
-            
-            // Adicionamos um pequeno delay para resetar o frame e evitar o erro de cache do sandbox
-            player.src = "about:blank"; 
-            
-            setTimeout(() => {
-                player.src = url;
-            }, 100);
-        }
-
-        // Lógica para capturar erros de carregamento básicos
-        document.getElementById('main-player').onerror = function() {
-            alert("Este servidor está instável. Tentando reconectar...");
-        };
-    </script>
+<script>
+function loadPlayer(url) {
+    const container = document.getElementById('container');
+    const msg = document.getElementById('msg');
+    
+    msg.innerText = "Alternando servidor... aguarde.";
+    
+    // Força a destruição e recriação do iframe para limpar erros de Sandbox do navegador
+    container.innerHTML = `
+        <iframe 
+            id="video-player"
+            src="${url}" 
+            allowfullscreen="true" 
+            webkitallowfullscreen="true" 
+            mozallowfullscreen="true"
+            allow="autoplay; encrypted-media"
+            referrerpolicy="no-referrer">
+        </iframe>
+    `;
+}
+</script>
 
 </body>
 </html>
